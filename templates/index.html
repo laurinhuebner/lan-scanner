@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>LAN-Scanner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+<header>
+  <h1>🔎 LAN-Scanner</h1>
+</header>
+
+<main class="container">
+  <section class="card">
+    <h2>Neuen Scan starten</h2>
+    <form method="post" action="/scan" class="grid">
+      <label>CIDR (z. B. 192.168.1.0/24)
+        <input type="text" name="cidr" placeholder="192.168.1.0/24" required>
+      </label>
+      <label>Ports (optional, Kommagetrennt)
+        <input type="text" name="ports" placeholder="{{ default_ports }}" value="{{ default_ports }}">
+      </label>
+      <div class="actions">
+        <button type="submit">Scan starten</button>
+      </div>
+    </form>
+    <p class="muted">Hinweis: Ping erfordert ICMP. Auf manchen Systemen kann das gedrosselt sein.</p>
+  </section>
+
+  <section class="card">
+    <h2>Letzte Scans</h2>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>CIDR</th><th>Start</th><th>Ende</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+      {% for s in scans %}
+        <tr>
+          <td>{{ s.id }}</td>
+          <td>{{ s.cidr }}</td>
+          <td>{{ s.started_at }}</td>
+          <td>{{ s.finished_at if s.finished_at else "—" }}</td>
+          <td>
+            {% if s.finished_at %}<span class="pill ok">fertig</span>{% else %}<span class="pill bad">läuft</span>{% endif %}
+          </td>
+          <td><a href="/scan/{{ s.id }}">Details</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  {% if active_scan %}
+  <section class="card">
+    <h2>Ergebnis für Scan #{{ active_scan.id }} ({{ active_scan.cidr }})</h2>
+    {% if hosts and hosts|length > 0 %}
+      <table>
+        <thead><tr><th>IP</th><th>Hostname</th><th>Offene Ports</th></tr></thead>
+        <tbody>
+        {% for h in hosts %}
+          <tr>
+            <td>{{ h.ip }}</td>
+            <td>{{ h.hostname or "–" }}</td>
+            <td>{{ h.open_ports or "–" }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      {% if not active_scan.finished_at %}
+        <p>Scan läuft… Seite in ein paar Sekunden aktualisieren.</p>
+      {% else %}
+        <p>Keine aktiven Hosts gefunden.</p>
+      {% endif %}
+    {% endif %}
+  </section>
+  {% endif %}
+</main>
+
+<footer>© {{ 2025 }}</footer>
+</body>
+</html>
