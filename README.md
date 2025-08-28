@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./banner.png" alt="lan-scanner Banner" width="100%">
+</p>
+
 # 🔎 LAN-Scanner (Flask)
 
 Kleines Webtool, das ein CIDR-Subnetz scannt, aktive Hosts findet, ein Set bekannter Ports prüft und die Ergebnisse in SQLite speichert. Ideal als Lern- und Admin-Tool – und später leicht ins Server-Dashboard integrierbar.
